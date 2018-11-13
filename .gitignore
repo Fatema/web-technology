@@ -1,1 +1,4 @@
 ml-latest/
+.idea/
+node_modules/
+swagger-editor/

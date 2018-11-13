@@ -1,0 +1,68 @@
+---
+swagger: "2.0"
+info:
+  description: "Movie recommendation tool"
+  version: "1.0.0"
+  title: "Melon"
+host: "localhost"
+basePath: "/api"
+schemes:
+- "https"
+produces:
+- "application/json"
+paths:
+  /movies:
+    get:
+      tags:
+      - "Movies"
+      summary: "List of movies in the system"
+      description: "The Movies endpoint returns information about the movies \n\
+        stored in the system and will be used for recommending other movies to a user\n"
+      operationId: "movies_get"
+      parameters:
+      - name: "genre"
+        in: "query"
+        description: "A specific movie genre"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "An array of movies"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Movie"
+        default:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "swagger_server.controllers.movies_controller"
+
+definitions:
+  Movie:
+    type: "object"
+    properties:
+      movie_id:
+        type: "integer"
+        format: "int64"
+        description: "Unique identifier representing a specific movie for a given title and genres."
+      title:
+        type: "string"
+        description: "Title of movie."
+      genres:
+        type: "string"
+        description: "Movie genres"
+    example:
+      movie_id: "image"
+      title: "product_id"
+      genres: "description"
+  Error:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+      fields:
+        type: "string"
