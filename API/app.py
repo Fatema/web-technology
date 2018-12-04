@@ -1,11 +1,14 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
+
+from API.model import RecommendationSystem
 
 app = Flask(__name__)
 
+m_rec = RecommendationSystem()
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def main():
+    return render_template('templates/index.html', movies=m_rec.movies)
 
 
 @app.route('/movies')
