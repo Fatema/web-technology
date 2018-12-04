@@ -1,0 +1,11 @@
+{
+  "profiles": [
+    {
+      "user_id" : 1,
+      "user_name": "Jack",
+      "search_words" : [],
+      "search_genres" : [],
+      "movie_ratings" : []
+    }
+  ]
+}

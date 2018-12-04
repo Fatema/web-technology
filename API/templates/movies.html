@@ -1,0 +1,30 @@
+{% extends index.html %}
+{% block content %}
+<h3>
+    Movies especially for you
+</h3>
+<div class="row">
+    {{ render_movie_card(recommended_movies) }}
+</div>
+<h3>
+    Movies Available
+</h3>
+<div class="row">
+    {{ render_movie_card(all_movies) }}
+</div>
+{% endblock %}
+
+{% macro render_movie_card(movies) %}
+{% for movie in movies %}
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{movie.title}}</h5>
+                <p class="card-text">{{ movie.genres}}</p>
+                <button class="btn-link" value="movie.movieId">rate movie</button>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endmacro %}
+

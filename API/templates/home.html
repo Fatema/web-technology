@@ -1,0 +1,32 @@
+{% extends index.html %}
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to Melon!</h1>
+    <p class="lead">Find and rate your favourite movies here!</p>
+    <hr class="my-4">
+    <div class="d-flex">
+        {% if login_fail %}
+        <div class="alert alert-danger" role="alert">
+            You have entered the wrong credentials! Try again or sign up with the link below
+        </div>
+        {% endif %}
+        <form href="{{ url_for(login) }}">
+            <div class="form-group">
+                <label for="_username">Username</label>
+                <input type="email" class="form-control" id="_username" aria-describedby="emailHelp" placeholder="Enter email">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <label for="_password">Password</label>
+                <input type="password" class="form-control" id="_password" placeholder="Password">
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="_terms">
+                <label class="form-check-label" for="_terms">Accept terms and conditions</label>
+            </div>
+            <a class="btn btn-primary btn-lg" href="{{ url_for(profile/new) }}" role="button">not registered? sign up now!</a>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
