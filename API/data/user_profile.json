@@ -3,9 +3,40 @@
     {
       "user_id" : 1,
       "user_name": "Jack",
-      "search_words" : [],
-      "search_genres" : [],
-      "movie_ratings" : []
+      "preferred_genres" : [
+        "action", "war", "horror"
+      ],
+      "search_words" : [
+        {"term":"blood", "count":2},
+        {"term":"war", "count":5},
+        {"term":"crime", "count":7}
+      ],
+      "search_genres" : [
+        {"genre":"action", "count": 5},
+        {"genre":"crime", "count": 7},
+        {"genre":"horror", "count": 5},
+        {"genre":"war", "count": 5}
+      ],
+      "search_years" : [
+        {"year":2000, "count": 5},
+        {"year":2005, "count": 5},
+        {"year":2008, "count": 4}
+      ],
+      "search_ratings" : [
+        {"rating":3.5, "count": 5},
+        {"rating":4, "count": 7},
+        {"rating":4.5, "count": 2}
+      ],
+      "movie_clicks" : [
+        {"movieId":71230, "count": 4},
+        {"movieId":23123, "count": 1},
+        {"movieId":32421, "count": 2}
+      ],
+      "movie_ratings" : [
+        {"movieId":71230, "rating": 4, "timestamp": 129370623},
+        {"movieId":23123, "rating": 4, "timestamp": 123807234},
+        {"movieId":42342, "rating": 4, "timestamp": 123234223}
+      ]
     }
   ]
 }
