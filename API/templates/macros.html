@@ -1,0 +1,31 @@
+{% macro render_movie_card(movies) %}
+{% for movie in movies %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title d-flex justify-content-between w-100">
+            <div class="w-100 mr-2">
+                {{movie.title}}
+            </div>
+            <div class="">
+                {% if movie.rating >= 4 %}
+                <span class="badge badge-success">
+                {% elif movie.rating >= 3 %}
+                <span class="badge badge-warning">
+                {% else %}
+                <span class="badge badge-danger">
+                {% endif %}
+                    {{ movie.rating | round(1) }}
+                </span>
+            </div>
+        </h5>
+        <p class="card-text">
+            {% set genres = movie.genres.split('|') %}
+            {% for genre in genres %}
+            <span class="badge badge-secondary">{{ genre }}</span>
+            {% endfor %}
+        </p>
+        <a class="btn btn-link" href="{{ url_for('movie_page', id=movie.movieId) }}">Learn More</a>
+    </div>
+</div>
+{% endfor %}
+{% endmacro %}

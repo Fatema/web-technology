@@ -9,21 +9,30 @@ class RecommendationEngine:
     def __init__(self):
         self.movies = pd.read_csv('data/movies.csv')
         self.ratings = pd.read_csv('data/ratings.csv')
+        self.tags = pd.read_csv('data/tags.csv')
         self.update_movie_data()
 
-    def get_latest_user_id(self):
-        return self.ratings['userId'].max()
+    def get_movie(self, movie_id):
+        movie_data = pd.merge(self.movies, self.ratings_mean_count.reset_index(), on='movieId')
+        return movie_data[movie_data['movieId'] == movie_id]
 
-    def get_movies(self, user_id, term=""):
-        user_full, recommendations = self.recommendation_ratings_matrix_factorization(user_id)
-        if recommendations is None and user_full is None:
-            movie_score = self.movies['title'].apply(lambda x: SequenceMatcher(None, term, x).ratio())
-            movies_list = (pd.merge(self.movies, movie_score.to_frame('close_score'), left_index=True, right_index=True).
-                           sort_values(by=['close_score']))
-            return movies_list
-        else:
-            recommendations['close_score'] = recommendations['title'].apply(lambda x: SequenceMatcher(None, term, x).ratio())
-            return recommendations
+    def get_movies_genres(self):
+        genres = set(self.movies['genres'].str.cat(sep='|').split('|'))
+        return list(genres)
+
+    def get_movie_tags(self, movie_id):
+        movie_tags = self.tags[self.tags['movieId'] == movie_id]
+        return pd.merge(movie_tags, self.ratings[['rating', 'userId', 'movieId']], on=['userId', 'movieId'])
+
+    def get_user_ratings(self, user_id):
+        return self.movie_data[self.movie_data.userId == user_id]
+
+    def get_movies(self, term=""):
+        movie_score = self.movies['title'].apply(lambda x: SequenceMatcher(None, term, x).ratio())
+        movies_list = (pd.merge(self.movies, movie_score.to_frame('close_score'), left_index=True, right_index=True).
+                       sort_values(ascending=False, by=['close_score']))
+        movies_list = pd.merge(movies_list, self.ratings_mean_count.reset_index(), on='movieId')
+        return movies_list
 
     def update_movie_data(self):
         self.movie_data = pd.merge(self.ratings, self.movies, on='movieId')
@@ -55,15 +64,15 @@ class RecommendationEngine:
         user_ratings = self.ratings[self.ratings['userId'] == user_id]
         movie_rated = user_ratings[user_ratings['movieId'] == movie_id]
 
-        if user_ratings.empty or movie_rated.empty:
-            self.ratings.append(df, ignore_index=True)
+        if user_ratings.shape[0] == 0 or movie_rated.shape[0] == 0:
+            self.ratings = self.ratings.append(df, ignore_index=True)
             with open('data/ratings.csv', 'a') as f:
-                df.to_csv(f, header=False)
+                df.to_csv(f, index=False, header=False)
         else:
            self.ratings.loc[(self.ratings['userId'] == user_id) & (self.ratings['movieId'] == movie_id), 'rating'] = rating
            self.ratings.loc[(self.ratings['userId'] == user_id) & (self.ratings['movieId'] == movie_id), 'timestamp'] = timestamp
            with open('data/ratings.csv', 'w') as f:
-               self.ratings.to_csv(f, header=True)
+               self.ratings.to_csv(f, index=False, header=True)
 
         self.update_movie_data()
 
@@ -81,7 +90,10 @@ class RecommendationEngine:
         corr_movie_top10 = (corr_movie[corr_movie['rating_counts'] > 50].
                                 sort_values('Correlation', ascending=False))
 
-        recommendations = pd.merge(self.movies, corr_movie_top10, how = 'inner')
+        recommendations = pd.merge(corr_movie_top10.reset_index(), self.movies, on='movieId')
+
+        # add average rating
+        recommendations = pd.merge(recommendations, self.ratings_mean_count.reset_index(), on='movieId')
 
         return recommendations
 
@@ -91,6 +103,8 @@ class RecommendationEngine:
         # (in the table the ids start from 0 this is due to numpy array
         # conversion and using the id as the index in the pivot table)
         user_row_number = user_id - 1
+        print(user_row_number)
+        print(self.preds)
         if user_row_number in self.preds.index:
             sorted_user_predictions = self.preds.iloc[user_row_number].sort_values(ascending=False)
         else:
@@ -98,6 +112,7 @@ class RecommendationEngine:
 
         # Get the user's data and merge in the movie information.
         user_data = self.ratings[self.ratings.userId == user_id]
+        print(user_data)
         user_full = (user_data.merge(self.movies, how='left', left_on='movieId', right_on='movieId')
             .sort_values(['rating'], ascending=False))
 
@@ -109,5 +124,7 @@ class RecommendationEngine:
                                      right_on='movieId').
                                rename(columns={user_row_number: 'Predictions'}).
                                sort_values('Predictions', ascending=False))
+
+        recommendations = pd.merge(recommendations, self.ratings_mean_count.reset_index(), on='movieId')
 
         return user_full, recommendations
