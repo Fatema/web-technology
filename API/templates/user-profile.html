@@ -22,29 +22,55 @@
             </div>
             {% for genre in genres %}
             {% if genre != '(no genres listed)' %}
-        <div class="form-group form-check-inline w-10">
-            <input type="checkbox" class="form-check-input" id="_{{genre}}" name="_genres"
-                   value="{{genre}}" {% if genre in user.preferred_genres %}checked{% endif %}>
-            <label class="form-check-label" for="_{{genre}}">{{genre}}</label>
-        </div>
+            <div class="form-group form-check-inline w-10">
+                <input type="checkbox" class="form-check-input" id="_{{genre}}" name="_genres"
+                       value="{{genre}}" {% if genre in user.preferred_genres %}checked{% endif %}>
+                <label class="form-check-label" for="_{{genre}}">{{genre}}</label>
+            </div>
             {% endif %}
-        {% endfor %}
+            {% endfor %}
         </div>
 
         <button type="submit" class="btn btn-primary">{% if logged_in %}Update{% else %}Register{% endif %}</button>
     </form>
 </div>
 {% if logged_in %}
-    <div class="bg-info mb-2 p-3 rounded">
-        <h2 class="mb-2 text-light">
-            Movies you have rated
-        </h2>
-        {% if ratings|length > 0 %}
-        <div class="card-columns">
-            {{ render_movie_card(ratings) }}
+<div class="row mb-2">
+    <div class="col-md-6 mb-2">
+        <div class="bg-secondary p-3 rounded">
+            <h2 class="mb-2 text-light">
+                Most searched terms
+            </h2>
+            {% if terms|length > 0 %}
+            {% for term in terms %}
+            <span class="badge badge-primary m-1" style="font-size:15px">{{ term.word }} {{ term.count }}</span>
+            {% endfor %}
+            {% endif %}
         </div>
-        {% endif %}
     </div>
+    <div class="col-md-6">
+        <div class="bg-secondary p-3 rounded">
+            <h2 class="mb-2 text-light">
+                Most searched genres
+            </h2>
+            {% if searched_genres|length > 0 %}
+            {% for searched_genre in searched_genres %}
+            <span class="badge badge-primary m-1" style="font-size:15px">{{ searched_genre.genre }} {{ searched_genre.count }}</span>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
 
+<div class="bg-info mb-2 p-3 rounded">
+    <h2 class="mb-2 text-light">
+        Movies you have rated
+    </h2>
+    {% if ratings|length > 0 %}
+    <div class="card-columns">
+        {{ render_movie_card(ratings) }}
+    </div>
+    {% endif %}
+</div>
 {% endif %}
 {% endblock %}

@@ -54,7 +54,8 @@ class Service:
             return None
         username = user.iloc[0]['username']
         password = user.iloc[0]['username']
-        preferred_genres = preferred_genres.iloc[0]['genre']
+        if preferred_genres.shape[0] != 0:
+            preferred_genres = preferred_genres.iloc[0]['genre']
         print(preferred_genres)
         return {'username': username,
                 'password': password,
@@ -204,6 +205,12 @@ class Service:
     def set_last_clicked_movie(self, id):
         self.last_movie_clicked = id
         return True
+
+    def get_searched_genres(self):
+        return self.search_genres.sort_values(ascending=False, by='count')
+
+    def get_searched_terms(self):
+        return self.search_words.sort_values(ascending=False, by='count')
 
     def get_extra_recommendations(self, page=1):
         if self.last_movie_clicked is None:

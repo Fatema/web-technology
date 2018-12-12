@@ -21,8 +21,9 @@ search_term = ""
 
 @app.route('/', methods=['GET','POST'])
 def main():
-    global logged_in
+    global logged_in, search_term
     if request.method == 'GET':
+        search_term = ""
         if logged_in:
             return redirect(url_for('get_movies'))
         else:
@@ -47,15 +48,20 @@ def logout():
 
 @app.route('/profile/', methods=['GET','POST'])
 def update_user_profile():
-    global logged_in
+    global logged_in, search_term
+    search_term = ""
     rated_movies = get_json(service.get_rated_movies())
     if request.method == 'GET':
         genres = service.get_genres()
         user_static_data = service.get_user_static_data()
+        searched_words = get_json(service.get_searched_terms());
+        searched_genres = get_json(service.get_searched_genres());
         return render_template("user-profile.html",
                                logged_in=logged_in,
                                genres=genres,
                                user=user_static_data,
+                               terms=searched_words,
+                               searched_genres=searched_genres,
                                ratings=rated_movies)
     elif request.method == 'POST':
         username = request.form.get('_username', "")
@@ -81,6 +87,8 @@ def update_user_profile():
 @app.route('/movie/<int:id>')
 @app.route('/movie/<int:id>/<int:page>', methods=['GET','POST'])
 def movie_page(id, page=1):
+    global search_term
+    search_term = ""
     if request.method == 'POST':
         rating = float(request.form.get('rating'))
         service.rate_movie(id, rating)
@@ -119,6 +127,9 @@ def get_movies(page=1):
         last_clicked_movie = ""
     else:
         last_clicked_movie = service.get_movie().iloc[0]['title']
+    if search_term is not "":
+        recommended_movies = []
+        extra_recommened_movies = []
     all_movies = get_json(service.search_movies(term, page=page))
     return render_template("movies.html",
                            recommended_movies=recommended_movies,
